@@ -25,16 +25,16 @@ def deal_cards(deck, players):
     # Shuffle the deck
     random.shuffle(deck)
 
-    # Initialize a hand for each player if it doesn't exist
-    for player in players:
-        if "hand" not in player:
-            player["hand"] = []
+    # Initialize a list to hold player cards
+    player_cards = []
 
     # Deal two cards to each player
-    for _ in range(2):
-        for player in players:
-            # Remove the card from the deck and add it to the player's hand
-            player["hand"].append(deck.pop())
+    for player in players:
+        # Remove two cards from the deck and add them to the player's hand
+        player_hand = [deck.pop(), deck.pop()]
+        player_cards.append({"name": player["name"], "cards": player_hand})
+
+    return player_cards
 
 
 def create_player_list(num_players, starting_money):
@@ -44,14 +44,47 @@ def create_player_list(num_players, starting_money):
         players.append(player)
     return players
 
+# This funtion will initialize the betting round
+# Looping through each player in the players_in_hand list asking for their action being the actions:
+    # Check (if it's allowed)
+    # Bet (if there's no bet yet) or Raise (if there's a bet)
+    # Fold (if the player wants to fold adding him to the players_that_folded list ))
+    # Call (if the player hasn´t made the highest bet yet)
+# If there's only one player that hasn't folded, he wins the pot and the hand ends
+# After each loop all players in the players_that_folded list are removed from the players_in_hand list
+# After the first loop the funtion ends if there's only one player in the players_in_hand list or if all the bets are equal
+
+def betting_round(players_in_hand, pot):
+    bets = {player['name']: 0 for player in players_in_hand}
+    players_that_folded = []
+    while True:
+        for player in players_in_hand:
+            options = ""
+            action = input(f"Es el turno de : {player['name']}, que desea hacer? {options}")
+            if action == "Check":
+                pass
+            elif action == "Bet":
+                pass
+            elif action == "Raise":
+                pass
+            elif action == "Fold":
+                players_that_folded.append(player)
+            elif action == "Call":
+                pass
+        for player in players_that_folded:
+            players_in_hand.remove(player)
+
+    #len(players_in_hand) > 1 and len(set(bets.values())) > 1:
+    
+ 
+
+
 # Main function to run a complete hand
 def hand(player_list):
     # Create and shuffle the deck
     deck = create_deck()
+    pass
 
-    
-    # Deal hole cards to players
-    hole_cards = deal_cards(deck, len(player_list))
 
    
 
@@ -67,8 +100,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     player_list = create_player_list(args.player_quantity,args.starting_money)
     deck = create_deck()
-    print(len(deck))
-    deal_cards(deck,player_list)
-    print(len(deck))
-    print(player_list)
+    player_cards = deal_cards(deck, player_list)
+    print(player_cards)
+    
     
