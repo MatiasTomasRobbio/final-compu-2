@@ -1,14 +1,19 @@
 import subprocess
 import time
 import os
-names = ['Alice', 'Bob', 'Charlie', 'David', 'Eve']
-port = 14666
+name = 'Alice'
+port = 14500
 
 # Get the absolute path of the chat_client.py file
-script_path = os.path.abspath('poker_game_app/chat_client.py')
+script_path = os.path.abspath('poker_game_app/client/chat_client.py')
 
 # Create a new terminal window for the server for each player and connect to the server
-for name in names:
-    subprocess.Popen(['gnome-terminal', '--', 'python3', script_path, '--port', str(port), '--name', name])
+
+chat = subprocess.Popen(['gnome-terminal', '--', 'python3', script_path, '--port', str(port), '--name', name])
     
-input('Press Enter to continue...')
+input('Press Enter to close...')
+
+chat.terminate()
+chat.wait()
+
+#No se puede cerrar por ser un terminal de gnome
