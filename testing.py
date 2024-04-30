@@ -6,8 +6,8 @@ player1 = Player("Alice", 100)
 player2 = Player("Bob", 100)
 players = [player1, player2]
 
-deck.shuffle()
-deck.deal_to_players(players, 2)
 
+print(player1)
 
-
+#Print object attributes
+print()
