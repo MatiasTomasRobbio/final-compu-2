@@ -2,6 +2,8 @@ import socket
 import threading
 import argparse
 
+
+
 # Function to receive messages from the server
 def receive_messages(client_socket):
     while True:
@@ -25,27 +27,17 @@ def send_messages(client_socket, client_name):
             print("Error sending message:", e)
             break
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="Chat client for the chat room server.")
-    parser.add_argument('--port', type=int, help='The port to connect to.')
-    parser.add_argument('--name', type=str, help='Your name in the chat room.')
 
-    # Parse the arguments
-    args = parser.parse_args()
-
+def chat_client(host, port, name):
     # Create a socket object
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-    # Define the host and port
-    host = 'localhost'
-    port = args.port
 
     try:
         # Connect to the server
         client_socket.connect((host, port))
 
         # Send the client name to the server
-        client_socket.send(args.name.encode())
+        client_socket.send(name.encode())   
 
         # Receive the welcome message from the server
         welcome_message = client_socket.recv(1024).decode()
@@ -60,9 +52,31 @@ if __name__ == '__main__':
 
         receive_thread.join()
         send_thread.join()
+       
 
     except Exception as e:
         print("Error:", e)
+
+
     finally:
         # Close the client socket
         client_socket.close()
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description="Chat client for the chat room server.")
+    parser.add_argument('--port', '-p' ,type=int, help='The port to connect to.')
+    parser.add_argument('--name', '-n', type=str, help='Your name in the chat room.')
+    parser.add_argument('--host', help='The host to connect to.', default='localhost', required=False)
+
+    # Parse the arguments
+    args = parser.parse_args()
+
+
+
+    # Define the host and port
+    host = args.host    
+    port = args.port
+
+    # Start the chat client
+    chat_client(host, port, args.name)
+
