@@ -1,6 +1,6 @@
 from deck_class import Deck
 import pickle
-
+import itertools
         
 
 class Game:
@@ -90,10 +90,127 @@ class Game:
             return False, winning_player
         return True, None
     
+
+    ###############################################################################################################3
+    #Funtions to determine the best hand       
+                    
+    def determine_best_hand(self,player):
+        #Create a list with all the cards in the player's hand and the community cards making a total of 7 cards
+        all_cards = player.hand + self.community_cards
+
+        possible_hands = []
+
+        # Generate all possible combinations of 5 cards
+        combinations = itertools.combinations(all_cards, 5)
+
+        # Evaluate each combination to determine the hand
+        for combination in combinations:
+            
+            hand_rank = self.evaluate_hand(combination)
+            possible_hands.append((combination, hand_rank))
+
+        # Sort the possible hands by rank in descending order
+        possible_hands.sort(key=lambda x: x[1], reverse=True)
+
+        # Return the best hand rank and highest card
+        best_hand_rank = possible_hands[0][1]
+        highest_card = max(player.hand, key=lambda x: self.deck.ranks)  # Find the highest card in the player's hand
+        
+        return best_hand_rank, highest_card
+
+
+    def evaluate_hand(self,hand):
+        ranks = [card[0] for card in hand]
+
+        # Count occurrences of each rank
+        rank_counts = {rank: ranks.count(rank) for rank in set(ranks)}
+
+
+        # Sort ranks in descending order of occurrences
+        sorted_ranks = sorted(rank_counts.keys(), key=lambda x: (rank_counts[x], ranks.index(x)), reverse=True)
+
+        # Check for royal flush and straight flush
+        if self.is_straight(hand) and self.is_flush(hand):
+            if sorted_ranks[0] == '10':
+                return 9
+            else:
+                return 8
+
+        # Check for four of a kind
+        for count in rank_counts.items():
+            if count == 4:
+                return 7
+
+        # Check for full house
+        if len(rank_counts) == 2 and 3 in rank_counts.values():
+            return 6
+
+        # Check for flush
+        if self.is_flush(hand):
+            return 5
+
+        # Check for straight
+        if self.is_straight(hand):
+            return 4
+
+        # Check for three of a kind
+        for count in rank_counts.items():
+            if count == 3:
+                return 3
+
+        # Check for two pairs
+        if list(rank_counts.values()).count(2) == 2:
+            return 2
+
+        # Check for one pair
+        if 2 in rank_counts.values():
+            return 1
+
+        # If none of the above, return the highest card
+        return 0
+
+
+    def is_straight(self,hand):
+        ranks = [card[0] for card in hand]
+        rank_values = {'2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, '10': 10, 'J': 11, 'Q': 12, 'K': 13, 'A': 14}
+        sorted_ranks = sorted(ranks, key=lambda x: rank_values[x])
+        for i in range(len(sorted_ranks) - 1):
+            if rank_values[sorted_ranks[i]] != rank_values[sorted_ranks[i + 1]] - 1:
+                return False
+        return True
+
+
+    def is_flush(self,hand):
+        suits = [card[1] for card in hand]
+        return len(set(suits)) == 1
+
+##########################################################################
+    def hand_rank_to_string(self,rank):
+        #Convert the hand rank to a string
+        hand_ranks = {
+            0: "High card",
+            1: "One pair",
+            2: "Two pairs",
+            3: "Three of a kind",
+            4: "Straight",
+            5: "Flush",
+            6: "Full house",
+            7: "Four of a kind",
+            8: "Straight flush",
+            9: "Royal flush"
+        }
+        return hand_ranks[rank]
+    
     def get_showdown_winner(self):
         players = self.get_participating_players()
-        #Get the best hand of each player
-        return players[0], "High Card"
+        #Get the winner of the showdown by comparing the hands of the players in a combination of community cards and player cards
+        best_hands = []
+        for player in players:
+            best_hands.append((player, self.determine_best_hand(player)))
+
+        best_hands.sort(key=lambda x: x[1], reverse=True)
+        return best_hands[0][0] , best_hands[0][1][0]
+    
     
 
 
@@ -258,7 +375,10 @@ class Game:
                     print("Added bet amount to player")
                     self.pot += bet_amount
                     print(f"Added bet amount to pot {self.pot}")
-                    self.current_bet += bet_amount
+
+                    if player.bet > self.current_bet:
+                        self.current_bet += bet_amount
+                    
                     self.broadcast(f"print",f"{player.name} raises by {bet_amount}. Current bet: {self.current_bet}. Pot: {self.pot}.")
                     break
             elif player.money == bet_amount:

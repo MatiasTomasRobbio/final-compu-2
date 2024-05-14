@@ -10,7 +10,14 @@ def receive_messages(client_socket):
         try:
             # Receive message from server
             message = client_socket.recv(1024).decode()
+            # If message is empty, server has closed the connection
+            if not message:
+                print("Server has closed the connection. You can now close this window")
+                client_socket.close()
+                break
+
             print(message)
+
         except Exception as e:
             print("Error receiving message:", e)
             break

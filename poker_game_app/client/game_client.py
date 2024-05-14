@@ -160,7 +160,7 @@ def handle_game(client_socket):
 
         elif command == "cant_call":
             print("You can't call. Please choose another action.")
-            options= ["fold", "all in"]
+            options= ["fold", "all_in"]
             choose_action(options,client_socket,game_data)
 
         elif command == "invalid_action":
@@ -182,8 +182,8 @@ def handle_game(client_socket):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--port", '-p', type=int, help="Enter the server IP address")
-    parser.add_argument("--name" , '-n' ,type=str , help="Enter the player's name")
+    parser.add_argument("--port", '-p', type=int, help="Enter the server IP address", required=True)
+    parser.add_argument("--name" , '-n' ,type=str , help="Enter the player's name", required=True)
     #If the server IP is not specified, it will default to localhost
     parser.add_argument("--server_ip", '-s',type=str, help="Enter the server IP address", default="localhost" , required=False)
 

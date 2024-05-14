@@ -18,7 +18,9 @@ def poker_game(players):
         game.reset()
 
         #Commencing a new hand 
-        game.broadcast(f"print", f"Starting a new hand.")
+        
+        game.broadcast(f"print", f"################# \n Starting a new hand.\n################# \n")
+ 
         game.deal_hands()
         
 
@@ -69,10 +71,15 @@ def poker_game(players):
             game.give_pot(winner)
 
         else:
-            game.broadcast(f"print", f"Showdown time!")
+        
+            game.broadcast(f"print", f"$$$$$$$$$$$$$$$\nShowdown time!\n$$$$$$$$$$$$$$$\n")
             winner , hand_rank  = game.get_showdown_winner()
-            game.broadcast(f"print", f"{winner.name} has won the hand with a {hand_rank}.")
+            
+
+            game.broadcast(f"print", f"\n{winner.name} has won the hand with a {game.hand_rank_to_string(hand_rank)}.\n")
             game.give_pot(winner)
+
+
         
 
 
